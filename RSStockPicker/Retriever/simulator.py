@@ -17,32 +17,32 @@ class simulator:
         self.today = dt.datetime.now()
         self.dateAgo = self.today + dt.timedelta(dataDaysAgo)
         
-
         self.buyList = {}
         self.currentHeldItems = {}
         self.allItemData = {}
-        self.getItemData()     
+        self.getItemData() 
     
     # Retrieves all dates and prices for given item list for past 180 days
     def getItemData(self):
-        itemPriceList = {}
-        itemNumber = 3138
-        link = "http://services.runescape.com/m=itemdb_rs/api/graph/" + str(itemNumber) + ".json"
-        f = requests.get(link)
-        loaded_json = json.loads(f.text)
-        for date in loaded_json["daily"]:
-            price = loaded_json["daily"][date]
-            # convert date from milliseconds to YEAR-MO-DA
-            # if the time is before 1900 UTC, all dates need to be shifted by 1
-            if dt.datetime.utcnow().hour < 1900:
-                date = (dt.datetime.fromtimestamp(float(date)/1000.0) + dt.timedelta(1)).strftime('%Y-%m-%d') 
-            else:
-                date = dt.datetime.fromtimestamp(float(date)/1000.0).strftime('%Y-%m-%d')
-                         
-            itemPriceList[date] = price
+        itemNumbers = [3138, 453, 1779, 225, 991, 40310, 28445, 28451, 28453, 28447, 28455, 28449]
         
-        self.allItemData[itemNumber] = itemPriceList
-    
+        for itemNumber in itemNumbers:
+            itemPriceList = {}
+            link = "http://services.runescape.com/m=itemdb_rs/api/graph/" + str(itemNumber) + ".json"
+            f = requests.get(link)
+            loaded_json = json.loads(f.text)
+            for date in loaded_json["daily"]:
+                price = loaded_json["daily"][date]
+                # convert date from milliseconds to YEAR-MO-DA
+                # if the time is before 1900 UTC, all dates need to be shifted by 1
+                if dt.datetime.utcnow().hour < 1900:
+                    date = (dt.datetime.fromtimestamp(float(date)/1000.0) + dt.timedelta(1)).strftime('%Y-%m-%d') 
+                else:
+                    date = dt.datetime.fromtimestamp(float(date)/1000.0).strftime('%Y-%m-%d')
+                             
+                itemPriceList[date] = price
+            self.allItemData[itemNumber] = itemPriceList
+        
     # Retrieves all valid item buys for all items in allItemData for the last 180 days until -30 days from today    
     def getBuyList(self):
         daysAgo30 = self.today + dt.timedelta(-30)
@@ -66,7 +66,8 @@ class simulator:
             
             if currentItemData:      
                 self.buyList[number] = currentItemData
-    
+
+        
     def buyItem(self, currentDate):
         currentItem = []
         for number, item in self.buyList.items():
@@ -100,6 +101,7 @@ class simulator:
             
     
     def runSimulation(self):
+        self.getItemData()
         self.getBuyList()
         
         for day in range(self.dataDaysAgo, 1):
