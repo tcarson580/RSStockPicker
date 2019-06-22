@@ -24,7 +24,7 @@ class simulator:
     
     # Retrieves all dates and prices for given item list for past 180 days
     def getItemData(self):
-        itemNumbers = [3138, 453, 1779, 225, 991, 40310, 28445, 28451, 28453, 28447, 28455, 28449]
+        itemNumbers = [3138, 453, 1779, 225, 991, 40310, 28445, 28451, 28453, 28447, 28455, 28449]  
         
         for itemNumber in itemNumbers:
             itemPriceList = {}
